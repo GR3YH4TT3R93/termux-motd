@@ -14,13 +14,15 @@ Collection of 'Message of the Day' scripts for [Termux](https://termux.com/).
 * figlet (termux-banner)
 
 
-## Install
+<!-- ## Install
     wget -qO- https://git.io/Jm5hb | bash
+-->
 
 **Manually**
 
-    git clone https://github.com/Generator/termux-motd.git ~/.motd
-    echo "$HOME/.motd/init.sh" >> ~/.profile # or .zprofile if using zsh
+    rm -rf /data/data/com.termux/files/use/etc/motd
+    git clone https://github.com/Generator/termux-motd.git /data/data/com.termux/files/use/etc/motd
+    echo "data/data/com.termux/files/use/etc/motd/init.sh" >> /data/data/com.termux/files/use/etc/profile # or .zprofile if using zsh
 
 ## Configure
 
@@ -30,3 +32,4 @@ Collection of 'Message of the Day' scripts for [Termux](https://termux.com/).
 ## Credits
 
 * [yboetz/motd](https://github.com/yboetz/motd) (Orignal work)
+* [generator/termux-motd](https://github.com/Generator) (Contributor)
