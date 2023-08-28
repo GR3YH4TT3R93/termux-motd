@@ -20,9 +20,9 @@ Collection of 'Message of the Day' scripts for [Termux](https://termux.com/).
 
 **Manually**
 
-    rm -rf /data/data/com.termux/files/use/etc/motd
-    git clone https://github.com/Generator/termux-motd.git /data/data/com.termux/files/use/etc/motd
-    echo "/data/data/com.termux/files/use/etc/motd/init.sh" >> /data/data/com.termux/files/use/etc/profile # or .zprofile if using zsh
+    rm -rf /data/data/com.termux/files/usr/etc/motd
+    git clone https://github.com/Generator/termux-motd.git /data/data/com.termux/files/usr/etc/motd
+    echo "/data/data/com.termux/files/usr/etc/motd/init.sh" >> /data/data/com.termux/files/usr/etc/profile # or .zprofile if using zsh
 
 ## Configure
 
