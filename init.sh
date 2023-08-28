@@ -2,8 +2,8 @@
 
 clear
 
-[ -d "data/data/com.termux/files/usr/etc/motd" ] && MOTD="data/data/com.termux/files/usr/etc/motd"
-[ -d "data/data/com.termux/files/usr/etc/.motd" ] && MOTD="data/data/com.termux/files/usr/etc/.motd"
+[ -d "/data/data/com.termux/files/usr/etc/motd" ] && MOTD="/data/data/com.termux/files/usr/etc/motd"
+[ -d "/data/data/com.termux/files/usr/etc/.motd" ] && MOTD="/data/data/com.termux/files/usr/etc/.motd"
 [ -d "$PREFIX/motd" ] && MOTD="$PREFIX/motd"
 
 for i in $(find $MOTD -maxdepth 1 -regex '.+/[0-9\-].+' -not -regex ".+\.disabled" | sort)
