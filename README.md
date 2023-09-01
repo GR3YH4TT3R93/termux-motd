@@ -2,11 +2,11 @@
 
 Collection of 'Message of the Day' scripts for [Termux](https://termux.com/).
 
-![Screen1](Screenhots/screen1.jpeg)
+![Screen1](Screenhots/android-logo-small.jpg)
 
 <details><summary>More Screenshots</summary>
-<img src="Screenhots/screen2.jpeg"/>
-<img src="Screenhots/screen3.jpeg"/>
+<img src="Screenhots/android-logo.jpg"/>
+<img src="Screenhots/termux-banner.jpg"/>
 </details>
 
 ### Requirements
