@@ -2,7 +2,7 @@
 
 # config
 max_usage=90
-alert_usage=50
+alert_usage=75
 bar_width=50
 # colors
 green="\e[1;32m"
