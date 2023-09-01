@@ -2,13 +2,12 @@
 
 # config
 max_usage=90
+alert_usage=50
 bar_width=50
 # colors
-white="\e[39m"
 green="\e[1;32m"
 red="\e[1;31m"
-dim="\e[2m"
-undim="\e[0m"
+yellow="\e[1;33m"
 BOLD='\033[1m'
 NC='\033[0m'
 
@@ -21,22 +20,31 @@ for line in "${dfs[@]}"; do
     usage=$(echo "$line" | awk '{print $5}' | sed 's/%//')
     used_width=$((($usage*$bar_width)/100))
     # color is green if usage < max_usage, else red
-    if [ "${usage}" -ge "${max_usage}" ]; then
+    if [ "${usage}" -ge "${alert_usage}" ]; then
+        color=$yellow
+    elif [ "${usage}" -ge "${max_usage}" ]; then
         color=$red
-    else
+    else 
         color=$green
     fi
     # print green/red bar until used_width
-    bar="[${color}"
+    bar="${color}\uee03"
     for ((i=0; i<$used_width; i++)); do
-        bar+="#"
+        bar+="\uee04"
     done
     # print dimmmed bar until end
-    bar+="${white}${dim}"
+    bar+="${color}"
     for ((i=$used_width; i<$bar_width; i++)); do
-        bar+="-"
+        bar+="\uee01"
     done
-    bar+="${undim}]"
+
+    # print empty end if usage < max_usage, else filled
+    if [ "${usage}" -ge "${max_usage}" ]; then
+        bar+="${color}\uee05"
+    else
+        bar+="${color}\uee02"
+    fi
+
     # print usage line & bar
     echo "${line}" | awk '{ printf("%-31s%+3s used out of %+4s\n", $6, $3, $2); }' | sed -e 's/^/  /'
     echo -e "${bar}" | sed -e 's/^/  /'
