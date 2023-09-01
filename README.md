@@ -1,6 +1,6 @@
 # Message of the Day
 
-Collection of 'Message of the Day' scripts for [Termux](https://termux.com/).
+A collection of 'Message of the Day' scripts for [Termux](https://termux.com/).
 
 ![Screen1](Screenhots/android-logo-small.jpg)
 
