@@ -12,6 +12,7 @@ A collection of 'Message of the Day' scripts for [Termux](https://termux.com/).
 ### Requirements
 
 * figlet (termux-banner only)
+* FiraCode NerdFont (disk-space progress bar ligatures)
 
 
 <!-- ## Install
