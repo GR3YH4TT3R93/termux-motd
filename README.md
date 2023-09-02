@@ -12,7 +12,8 @@ A collection of 'Message of the Day' scripts for [Termux](https://termux.com/).
 ### Requirements
 
 * figlet (termux-banner only)
-* FiraCode NerdFont (disk-space progress bar ligatures)
+* [FiraCode NerdFont](https://github.com/tonsky/FiraCode) (disk-space progress bar ligatures)
+* [Unexpected Keyboard](https://f-droid.org/packages/juloo.keyboard2/)
 
 
 <!-- ## Install
