@@ -11,7 +11,7 @@ A collection of 'Message of the Day' scripts for [Termux](https://termux.com/).
 
 ### Requirements
 
-* figlet (termux-banner)
+* figlet (termux-banner only)
 
 
 <!-- ## Install
