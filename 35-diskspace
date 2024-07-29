@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/data/data/com.termux/files/usr/bin/env zsh
 
 # config
 max_usage=90
@@ -12,7 +12,8 @@ BOLD='\033[1m'
 NC='\033[0m'
 
 # disk usage: ignore zfs, squashfs & tmpfs
-mapfile -t dfs < <(df -H -t sdcardfs -t fuse -t fuse.rclone | tail -n+2)
+# readarray -t dfs < <(df -H -t sdcardfs -t fuse -t fuse.rclone | tail -n+2)
+dfs=("${(@f)$(df -H -t sdcardfs -t fuse -t fuse.rclone | tail -n+2)}")
 printf "\n${BOLD}Disk Usage:${NC}\n"
 
 for line in "${dfs[@]}"; do

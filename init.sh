@@ -1,10 +1,10 @@
-#!/data/data/com.termux/files/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/env zsh
 
 clear
 
-[ -d "/data/data/com.termux/files/usr/etc/motd" ] && MOTD="/data/data/com.termux/files/usr/etc/motd"
+[ -d "$PREFIX/etc/motd" ] && MOTD="$PREFIX/etc/motd"
 
 for i in $(find $MOTD -maxdepth 1 -regex '.+/[0-9\-].+' -not -regex ".+\.disabled" | sort)
 do
-    bash $i
+    zsh $i
 done

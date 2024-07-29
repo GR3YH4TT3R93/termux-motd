@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/env zsh
 
 c1="\e[1;32m" # Green
 c2="\e[39m"   # Wite
