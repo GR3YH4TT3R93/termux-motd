@@ -24,7 +24,7 @@ for line in "${dfs[@]}"; do
         color=$yellow
     elif [ "${usage}" -ge "${max_usage}" ]; then
         color=$red
-    else 
+    else
         color=$green
     fi
     # print green/red bar until used_width
@@ -44,6 +44,9 @@ for line in "${dfs[@]}"; do
     else
         bar+="${color}\uee02"
     fi
+
+    # escape color
+    bar+="${NC}"
 
     # print usage line & bar
     echo "${line}" | awk '{ printf("%-31s%+3s used out of %+4s\n", $6, $3, $2); }' | sed -e 's/^/  /'
