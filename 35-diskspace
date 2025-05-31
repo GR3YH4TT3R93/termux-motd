@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/env zsh
 
 # config
-max_usage=90
+max_usage=95
 alert_usage=75
 bar_width=50
 # colors
@@ -11,45 +11,63 @@ yellow="\e[1;33m"
 BOLD='\033[1m'
 NC='\033[0m'
 
-# disk usage: ignore zfs, squashfs & tmpfs
-# readarray -t dfs < <(df -H -t sdcardfs -t fuse -t fuse.rclone | tail -n+2)
-dfs=("${(@f)$(df -H -t sdcardfs -t fuse -t fuse.rclone | tail -n+2)}")
+# Pre-build bar components to avoid repeated string operations
+# Using the same Unicode characters as original
+bar_start="\uee03"
+bar_filled="\uee04"
+bar_empty="\uee01"
+bar_end_full="\uee05"
+bar_end_empty="\uee02"
+
+# Single df call with direct processing - avoid storing in array first
 printf "\n${BOLD}Disk Usage:${NC}\n"
 
-for line in "${dfs[@]}"; do
-    # get disk usage
-    usage=$(echo "$line" | awk '{print $5}' | sed 's/%//')
-    used_width=$((($usage*$bar_width)/100))
-    # color is green if usage < max_usage, else red
-    if [ "${usage}" -ge "${alert_usage}" ]; then
-        color=$yellow
-    elif [ "${usage}" -ge "${max_usage}" ]; then
+# Process df output in a single pipeline to minimize subprocess calls
+df -H -t sdcardfs -t fuse -t fuse.rclone | tail -n+2 | while IFS= read -r line; do
+    # Use parameter expansion instead of external awk/sed for extracting usage
+    # Split line into fields using zsh word splitting
+    fields=($=line)
+    usage_percent="${fields[5]}"
+    usage="${usage_percent%\%}"  # Remove % using parameter expansion
+    used_space="${fields[3]}"
+    total_space="${fields[2]}"
+    mount_point="${fields[6]}"
+
+    # Calculate used width once
+    used_width=$(( (usage * bar_width) / 100 ))
+
+    # Determine color once using arithmetic comparison
+    if (( usage >= max_usage )); then
         color=$red
+    elif (( usage >= alert_usage )); then
+        color=$yellow
     else
         color=$green
     fi
-    # print green/red bar until used_width
-    bar="${color}\uee03"
-    for ((i=0; i<$used_width; i++)); do
-        bar+="\uee04"
-    done
-    # print dimmmed bar until end
-    bar+="${color}"
-    for ((i=$used_width; i<$bar_width; i++)); do
-        bar+="\uee01"
+
+    # Build bar efficiently
+    bar="${color}${bar_start}"
+
+    # Build bar using loops (but more efficiently than original)
+    for ((i=0; i<used_width; i++)); do
+        bar+="${bar_filled}"
     done
 
-    # print empty end if usage < max_usage, else filled
-    if [ "${usage}" -ge "${max_usage}" ]; then
-        bar+="${color}\uee05"
+    # Add empty portion
+    for ((i=used_width; i<bar_width; i++)); do
+        bar+="${bar_empty}"
+    done
+
+    # Add end character
+    if (( usage == max_usage )); then
+        bar+="${bar_end_full}"
     else
-        bar+="${color}\uee02"
+        bar+="${bar_end_empty}"
     fi
 
-    # escape color
     bar+="${NC}"
 
-    # print usage line & bar
-    echo "${line}" | awk '{ printf("%-31s%+3s used out of %+4s\n", $6, $3, $2); }' | sed -e 's/^/  /'
-    echo -e "${bar}" | sed -e 's/^/  /'
+    # Format output using printf instead of awk for better performance
+    printf "  %-31s%+3s used out of %+4s\n" "$mount_point" "$used_space" "$total_space"
+    printf "  %b\n" "$bar"
 done

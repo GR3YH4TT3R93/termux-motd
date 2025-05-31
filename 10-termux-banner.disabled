@@ -1,11 +1,11 @@
-#!/data/data/com.termux/files/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/env zsh
 
 if ! hash figlet; then
     echo -e "filget not found.\nPlease install figlet first"
     exit 1
 else
-    BLUE='\e[1;34m'
-    printf "${BLUE}"
+    BLUE="\e[1;34m"
+    printf "$BLUE"
     figlet -c "Termux"
-    printf "${BLUE}"
-fi 
+    printf "$BLUE"
+fi

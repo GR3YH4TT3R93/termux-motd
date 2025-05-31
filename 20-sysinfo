@@ -1,43 +1,79 @@
 #!/data/data/com.termux/files/usr/bin/env zsh
 
-tmp=$(mktemp -d)
-trap 'rm -rf "$tmp"' EXIT
-
-# Fix loadavg
-uptime | grep -Po "average: \K.+"| awk -F", " '{ print $1,$2,$3 }' > $tmp/loadavg
-
-# get load averages
-IFS=" " read LOAD1 LOAD5 LOAD15 <<<$(cat $tmp/loadavg)
-# get free memory
-IFS=" " read USED AVAIL TOTAL <<<$(free -htm | grep "Mem" | awk {'print $3,$7,$2'})
-# get processes
-PROCESS=$(ps -eo user=|sort|uniq -c | awk '{ print $2 " " $1 }')
-PROCESS_ALL=$(echo "$PROCESS"| awk {'print $2'} | awk '{ SUM += $1} END { print SUM }')
-PROCESS_ROOT=$(echo "su -c ${PROCESS}"| grep root | awk {'print $2'})
-PROCESS_USER=$(echo "$PROCESS"| grep -v root | awk {'print $2'} | awk '{ SUM += $1} END { print SUM }')
-# get processors
-PROCESSOR_NAME=$(grep "model name" /proc/cpuinfo | cut -d ' ' -f3- | awk {'print $0'} | head -1)
-PROCESSOR_COUNT=$(grep -ioP 'processor\t:' /proc/cpuinfo | wc -l)
-
-if [[ -d /system/app/ && -d /system/priv-app ]]; then
-    DISTRO="Android $(getprop ro.build.version.release)"
-    MODEL="$(getprop ro.product.brand) $(getprop ro.product.model)"
-fi
-
+# Colors
 W="\e[0;39m"
 G="\e[1;32m"
 C="\e[1;36m"
 BOLD='\033[1m'
 
+# Get all system info in single operations to minimize subprocess calls
+
+# 1. Load averages - direct extraction without temp file
+loadavg_data=$(uptime)
+# Use parameter expansion instead of grep/awk chain
+loadavg_part="${loadavg_data##*average: }"
+# Split into array using zsh
+load_array=(${=loadavg_part//,/ })
+LOAD1="${load_array[1]}"
+LOAD5="${load_array[2]}"
+LOAD15="${load_array[3]}"
+
+# 2. Memory info - single free call with efficient parsing
+mem_line=$(free -htm | awk '/^Mem:/ {print $3, $7, $2}')
+mem_array=(${=mem_line})
+USED="${mem_array[1]}"
+AVAIL="${mem_array[2]}"
+TOTAL="${mem_array[3]}"
+
+# 3. Process info - optimized single-pass processing
+# Get process counts efficiently in one pipeline
+process_info=$(ps -eo user= | sort | uniq -c | awk '{
+    total_processes += $1
+    if ($2 == "root") {
+        root_processes = $1
+    } else {
+        user_processes += $1
+    }
+}
+END {
+    print user_processes, total_processes, root_processes
+}')
+
+process_array=(${=process_info})
+PROCESS_USER="${process_array[1]:-0}"
+PROCESS_ALL="${process_array[2]:-0}"
+PROCESS_ROOT="${process_array[3]:-0}"
+
+# 4. CPU count - single operation
+PROCESSOR_COUNT=$(nproc 2>/dev/null || grep -c "^processor" /proc/cpuinfo)
+
+# 5. System detection - minimize getprop calls
+if [[ -d /system/app/ && -d /system/priv-app ]]; then
+    # Get both properties in one go if possible, or cache results
+    android_version=$(getprop ro.build.version.release)
+    device_brand=$(getprop ro.product.brand)
+    device_model=$(getprop ro.product.model)
+
+    DISTRO="Android $android_version"
+    MODEL="$device_brand $device_model"
+fi
+
+# 6. Get kernel info once
+kernel_info=$(uname -sr)
+
+# 7. Get uptime once
+uptime_info=$(uptime -p)
+
+# Output everything in one go
 echo -e "
 ${W}${BOLD}System Info:
 $C  Distro    : $W$DISTRO
 $C  Host      : $W$MODEL
-$C  Kernel    : $W$(uname -sr)
+$C  Kernel    : $W$kernel_info
 
-$C  Uptime    : $W$(uptime -p)
+$C  Uptime    : $W$uptime_info
 $C  Load      : $G$LOAD1$W (1m), $G$LOAD5$W (5m), $G$LOAD15$W (15m)
 $C  Processes : $G$PROCESS_USER$W (user), $G$PROCESS_ALL$W (total)
 
-$C  CPU       : $W$PROCESSOR_NAME ($G$PROCESSOR_COUNT$W vCPU)
+$C  CPU       : $G$PROCESSOR_COUNT$W vCPU core(s)
 $C  Memory    : $G$USED$W used, $G$AVAIL$W avail, $G$TOTAL$W total$W"
